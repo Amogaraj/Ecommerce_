@@ -1,0 +1,686 @@
+/* Reset Default Styles */
+
+@import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=Lemonada:wght@300..700&family=Share+Tech&family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap');
+
+*{
+
+    margin:0;
+
+    padding:0;
+
+    box-sizing:border-box;
+
+    font-family: "Share Tech", sans-serif;
+
+}
+
+
+
+/* Navbar */
+
+
+
+.navbar{
+
+
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+
+
+padding:18px 8%;
+
+
+
+background:rgba(0,0,0,0.8);
+
+backdrop-filter:blur(10px);
+
+
+
+color:#FACC15;
+
+
+
+position:sticky;
+
+top:0;
+
+z-index:1000;
+
+
+
+}
+
+
+
+/* Logo */
+
+
+
+.logo{
+
+    font-size:22px;
+
+    font-weight:bold;
+
+}
+
+
+
+/* Nav Links */
+
+
+
+.nav-links{
+
+
+
+    list-style:none;
+
+    display:flex;
+
+    gap:35px;
+
+
+
+}
+
+
+
+.nav-links a{
+
+
+
+    text-decoration:none;
+
+    color:#FACC15;
+
+    font-size:16px;
+
+
+
+    position:relative;
+
+
+
+}
+
+
+
+/* Hover animation */
+
+
+
+.nav-links a::after{
+
+
+
+    content:"";
+
+    width:0%;
+
+    height:2px;
+
+    background:#FACC15;
+
+
+
+    position:absolute;
+
+    left:0;
+
+    bottom:-5px;
+
+
+
+    transition:0.3s;
+
+
+
+}
+
+
+
+.nav-links a:hover::after{
+
+
+
+    width:100%;
+
+
+
+}
+
+
+
+/* Hamburger menu */
+
+/* --- PREMIUM HAMBURGER: THE SHOOTING DOT & SPIN --- */
+.menu-btn {
+    display: none;
+    cursor: pointer;
+    position: relative;
+    z-index: 1001;
+    width: 35px;
+    height: 26px;
+}
+
+.menu-btn span {
+    position: absolute;
+    height: 3px;
+    background: #FACC15;
+    border-radius: 5px;
+    /* An exaggerated, dramatic spring curve */
+    transition: all 0.6s cubic-bezier(0.8, -0.4, 0.2, 1.4); 
+    right: 0;
+}
+
+/* Base Setup - Staggered look */
+.menu-btn span:nth-child(1) {
+    top: 0;
+    width: 100%;
+}
+.menu-btn span:nth-child(2) {
+    top: 11px;
+    width: 60%; /* Shorter middle line */
+}
+.menu-btn span:nth-child(3) {
+    top: 22px;
+    width: 100%;
+}
+
+/* Hover effect - Magnetic pull */
+.menu-btn:hover span:nth-child(1) { width: 80%; }
+.menu-btn:hover span:nth-child(2) { width: 100%; }
+.menu-btn:hover span:nth-child(3) { width: 80%; }
+
+/* --- OPEN STATE: The Magic --- */
+.menu-btn.open span:nth-child(1) {
+    width: 100%;
+    /* Drops to center, spins an extra half-turn (180 + 45) */
+    transform: translateY(11px) rotate(225deg); 
+}
+
+.menu-btn.open span:nth-child(2) {
+    /* Morphs from a line into a small dot */
+    width: 8px; 
+    height: 8px;
+    border-radius: 50%;
+    top: 9px;
+    /* Shoots out to the right and fades away */
+    right: -40px; 
+    opacity: 0; 
+}
+
+.menu-btn.open span:nth-child(3) {
+    width: 100%;
+    /* Rises to center, spins the opposite way */
+    transform: translateY(-11px) rotate(-225deg); 
+}
+
+
+
+/* Mobile Responsive */
+
+
+
+@media(max-width:768px){
+
+
+
+    .nav-links{
+
+
+
+        position:absolute;
+
+        top:100%;
+
+        left:-100%;
+
+
+
+        width:100%;
+
+        background:#111;
+
+
+
+        flex-direction:column;
+
+        text-align:center;
+
+
+
+        transition:0.4s;
+
+
+
+    }
+
+
+
+    .nav-links li{
+
+        padding:15px 0;
+
+    }
+
+
+
+    .nav-links.active{
+
+        left:0;
+
+    }
+
+
+
+    .menu-btn{
+
+        display:flex;
+
+    }
+
+
+
+}
+
+
+
+/* SERVICE HERO */
+
+
+
+.service-hero{
+
+text-align:center;
+
+padding:80px 20px;
+
+background-image: url(images/vecteezy_yellow-abstract-background-vector-illustration_13828593.jpg);
+
+color:white;
+
+}
+
+
+
+.service-hero h1{
+
+font-size:40px;
+
+margin-bottom:10px;
+
+}
+
+
+
+.service-hero p{
+
+font-size:18px;
+
+}
+
+
+
+/* SERVICES SECTION */
+
+
+
+.services-section{
+
+padding:60px 8%;
+
+display:grid;
+
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+
+gap:30px;
+
+
+
+}
+
+
+
+.service-card{
+
+background:#FACC15;
+
+padding:30px;
+
+text-align:center;
+
+border-radius:10px;
+
+box-shadow:0 10px 20px rgba(0,0,0,0.1);
+
+transition:0.3s;
+
+}
+
+
+
+.service-card:hover{
+
+transform:translateY(-8px);
+
+}
+
+
+
+.service-card img{
+
+width:70px;
+
+margin-bottom:15px;
+
+}
+
+
+
+.service-card h2{
+
+margin-bottom:10px;
+
+}
+
+
+
+/* EXTRA SERVICES */
+
+
+
+.extra-services{
+
+padding:60px 8%;
+
+background:#FACC15;
+
+text-align:center;
+
+}
+
+
+
+.extra-container{
+
+display:grid;
+
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+
+gap:25px;
+
+margin-top:30px;
+
+}
+
+
+
+.extra-card{
+
+background:#f9f9f9;
+
+padding:25px;
+
+border-radius:10px;
+
+box-shadow:0 5px 15px rgba(0,0,0,0.1);
+
+}
+
+
+
+/* FOOTER */
+
+
+        /* =========================================
+           ULTRA FOOTER STYLES (Floating & Liquid)
+           ========================================= */
+
+        .ultra-footer {
+            background: #050505; 
+            padding-top: 80px;
+            position: relative;
+            font-family: "Share Tech", sans-serif;
+            margin-top: 30px; 
+        }
+
+        /* --- GRID LAYOUT --- */
+        .ultra-footer-content { 
+            padding: 0 8%; 
+        }
+
+        .footer-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+            gap: 40px; 
+            margin-bottom: 60px; 
+            border-bottom: 1px solid #222; 
+            padding-bottom: 50px;
+        }
+
+        /* ADDED: Global centering for the columns */
+        .footer-block {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .block-title { 
+            color: #FACC15; 
+            margin-bottom: 25px; 
+            font-size: 18px; 
+            letter-spacing: 2px; 
+            text-transform: uppercase; 
+        }
+
+        .footer-text { 
+            color: #888; 
+            line-height: 1.8; 
+            margin-bottom: 25px; 
+        }
+
+        /* --- UNIQUE EXPANDING SOCIAL PILLS --- */
+        .social-pills { 
+            display: flex; 
+            gap: 15px; 
+            justify-content: center; /* ADDED: centers the buttons */
+        }
+
+        .social-btn {
+            display: flex;
+            align-items: center;
+            background: transparent;
+            border: 1px solid #333;
+            border-radius: 40px;
+            color: #fff;
+            text-decoration: none;
+            overflow: hidden;
+            width: 45px; 
+            height: 45px;
+            transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1), background 0.4s, border-color 0.4s;
+            position: relative;
+            outline: none;
+        }
+
+        .social-btn .icon {
+            width: 45px;
+            height: 45px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            flex-shrink: 0; 
+            z-index: 2;
+        }
+
+        .social-btn .text {
+            font-size: 14px;
+            font-weight: 600;
+            white-space: nowrap;
+            opacity: 0;
+            transform: translateX(-15px); 
+            transition: opacity 0.3s ease, transform 0.4s ease;
+        }
+
+        /* --- THE HOVER ANIMATION --- */
+        .social-btn:hover, .social-btn:focus-visible {
+            width: 140px; 
+        }
+
+        .social-btn:hover .text, .social-btn:focus-visible .text {
+            opacity: 1;
+            transform: translateX(0); 
+        }
+
+        .social-btn.facebook:hover, .social-btn.facebook:focus-visible {
+            background: #1877F2;
+            border-color: #1877F2;
+            box-shadow: 0 8px 20px rgba(24, 119, 242, 0.4);
+        }
+
+        .social-btn.instagram:hover, .social-btn.instagram:focus-visible {
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            border-color: transparent;
+            box-shadow: 0 8px 20px rgba(220, 39, 67, 0.4);
+        }
+
+        .social-btn.twitter:hover, .social-btn.twitter:focus-visible {
+            background: #1DA1F2;
+            border-color: #1DA1F2;
+            box-shadow: 0 8px 20px rgba(29, 161, 242, 0.4);
+        }
+
+        /* --- LINK ANIMATION: THE ARROW SLIDE --- */
+/* --- LINK ANIMATION: THE ARROW SLIDE --- */
+        .ultra-links { 
+            list-style: none; 
+            padding: 0; /* Ensures the list stays perfectly centered */
+        }
+
+        .ultra-links li { 
+            margin-bottom: 18px; 
+            /* REMOVED: overflow: hidden; (This was eating the arrows and text!) */
+        }
+
+        .ultra-links a {
+            color: #888; 
+            text-decoration: none; 
+            display: inline-flex; 
+            align-items: center; 
+            transition: 0.3s ease; 
+            position: relative;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .ultra-links a::before {
+            content: "→"; 
+            position: absolute; 
+            left: -20px; 
+            opacity: 0; 
+            color: #FACC15; 
+            transition: 0.3s ease;
+        }
+
+        .ultra-links a:hover, .ultra-links a:focus-visible { 
+            color: #fff; 
+            transform: translateX(25px); 
+        }
+
+        .ultra-links a:hover::before, .ultra-links a:focus-visible::before { 
+            left: -25px; 
+            opacity: 1; 
+        }
+        /* --- MASSIVE LIQUID LOGO ANIMATION --- */
+        .footer-bottom-bar { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding-bottom: 40px; 
+            width: 100%;
+            overflow: hidden; 
+        }
+
+        .massive-logo {
+            font-size: 12vw; 
+            font-weight: 900;
+            color: transparent;
+            -webkit-text-stroke: 2px #333; 
+            text-decoration: none;
+            letter-spacing: 5px;
+            position: relative;
+            display: inline-block; 
+            line-height: 1; 
+            white-space: nowrap; 
+            outline: none;
+        }
+
+        .massive-logo::before {
+            content: attr(data-text);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 0; 
+            height: 100%;
+            color: #FACC15; 
+            -webkit-text-stroke: 0px transparent;
+            overflow: hidden;
+            white-space: nowrap;
+            transition: width 0.8s cubic-bezier(0.86, 0, 0.07, 1); 
+        }
+
+        .massive-logo:hover::before, .massive-logo:focus-visible::before {
+            width: 100%; 
+            filter: drop-shadow(0 0 30px rgba(250, 204, 21, 0.041)); 
+        }
+
+        .massive-logo:hover, .massive-logo:focus-visible {
+            -webkit-text-stroke: 2px rgba(250, 204, 21, 0.089);
+        }
+
+        .copyright-area { 
+            margin-top: 15px; 
+            color: #FACC15; 
+            font-size: 14px; 
+        }
+
+        /* --- MOBILE RESPONSIVENESS --- */
+        @media(max-width: 768px) {
+            .footer-cta { 
+                flex-direction: column; 
+                gap: 20px; 
+                text-align: center; 
+                margin-top: -100px; 
+                padding: 30px 20px; 
+                width: 90%;
+            }
+            .footer-cta h2 { font-size: 24px; }
+
+            .social-pills {
+                flex-wrap: wrap; 
+            }
+            
+            .ultra-links a:hover, .ultra-links a:focus-visible { 
+                transform: translateX(10px); 
+            }
+
+            .ultra-links a:hover::before, .ultra-links a:focus-visible::before {
+                left: -15px;
+            }
+            
+            /* FIXED MASSIVE LOGO */
+            .massive-logo { 
+                font-size: 15vw; 
+                -webkit-text-stroke: 1px #333; 
+                letter-spacing: 2px; 
+            }
+        }

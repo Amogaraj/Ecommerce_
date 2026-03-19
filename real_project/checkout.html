@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>God Tier Secure Checkout | MyBrand</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- GLOBAL & ANIMATED BACKGROUND --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Space Grotesk', sans-serif; }
+        
+        /* THE MOBILE WOBBLE FIX */
+        html, body { 
+            width: 100%; overflow-x: hidden; margin: 0; padding: 0;
+            background-color: #f4f4f5; color: #050505; position: relative;
+            min-height: 100vh;
+        }
+        
+        /* Moving Ambient Glows */
+        .ambient-glow {
+            position: fixed; width: 50vw; height: 50vw; border-radius: 50%;
+            background: radial-gradient(circle, rgba(250, 204, 21, 0.12) 0%, rgba(250, 204, 21, 0) 70%);
+            top: -20%; left: -10%; z-index: -1; animation: floatGlow 15s infinite alternate ease-in-out;
+        }
+        .ambient-glow.two { top: 40%; left: 60%; animation-delay: -5s; background: radial-gradient(circle, rgba(250, 204, 21, 0.08) 0%, rgba(250, 204, 21, 0) 70%);}
+        @keyframes floatGlow { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(10%, 10%) scale(1.2); } }
+
+        /* --- HEADER --- */
+        .checkout-header {
+            background: rgba(5, 5, 5, 0.85); backdrop-filter: blur(15px);
+            padding: 20px 8%; display: flex; justify-content: space-between; align-items: center;
+            color: #facc15; position: sticky; top: 0; z-index: 100;
+        }
+        .checkout-header .logo { font-family: 'Share Tech', sans-serif; font-size: 26px; font-weight: bold; text-decoration: none; color: #facc15; letter-spacing: 2px;}
+        .secure-badge { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: #fff; }
+
+        /* --- PROGRESS BAR --- */
+        .progress-container {
+            max-width: 1200px; margin: 30px auto 10px; padding: 0 5%;
+            display: flex; justify-content: space-between; position: relative;
+        }
+        .progress-container::before {
+            content: ''; position: absolute; top: 50%; left: 5%; right: 5%;
+            height: 2px; background: rgba(0,0,0,0.1); z-index: 1; transform: translateY(-50%);
+        }
+        .progress-step {
+            background: #f4f4f5; padding: 0 15px; position: relative; z-index: 2;
+            font-weight: 700; color: #aaa; transition: 0.4s; font-size: 1.1rem;
+        }
+        .progress-step.active { color: #050505; text-shadow: 0 0 10px rgba(250, 204, 21, 0.3); }
+        .progress-step.completed { color: #2ecc71; }
+
+        /* --- LAYOUT GRID --- */
+        .checkout-container {
+            max-width: 1200px; margin: 30px auto 80px; padding: 0 5%;
+            display: grid; grid-template-columns: 1.5fr 1fr; gap: 40px; align-items: start;
+        }
+
+        /* --- GLASSMORPHISM CARDS --- */
+        .step-card, .summary-card {
+            background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.8); border-radius: 20px; padding: 35px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.05); margin-bottom: 25px; transition: 0.4s ease;
+        }
+        
+        .step-header { display: flex; align-items: center; gap: 15px; font-size: 1.4rem; font-weight: 700; color: #aaa; transition: 0.3s; }
+        .step-card.active .step-header { color: #050505; }
+        .step-number {
+            background: rgba(0,0,0,0.05); color: #888; width: 40px; height: 40px; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center; font-size: 1.1rem; transition: 0.4s;
+        }
+        .step-card.active .step-number { background: #facc15; color: #050505; box-shadow: 0 0 20px rgba(250, 204, 21, 0.4); }
+        .step-card.completed .step-number { background: #050505; color: #facc15; content: "✓"; }
+
+        .step-content { display: none; margin-top: 25px; }
+        .step-card.active .step-content { display: block; animation: slideDown 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- FLOATING LABEL INPUTS --- */
+        .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        .input-full { grid-column: span 2; }
+        
+        .floating-group { position: relative; margin-bottom: 15px; width: 100%; }
+        .floating-group input, .floating-group textarea {
+            width: 100%; padding: 22px 15px 10px; border: 2px solid rgba(0,0,0,0.1); border-radius: 12px;
+            font-size: 1rem; outline: none; background: rgba(255,255,255,0.9); transition: 0.3s; font-family: 'Space Grotesk', sans-serif; resize: none;
+        }
+        .floating-group label {
+            position: absolute; left: 15px; top: 18px; color: #888; font-size: 1rem;
+            transition: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); pointer-events: none; font-weight: 600;
+        }
+        .floating-group input:focus, .floating-group textarea:focus, 
+        .floating-group input:not(:placeholder-shown), .floating-group textarea:not(:placeholder-shown) { 
+            border-color: #050505; box-shadow: 0 8px 20px rgba(0,0,0,0.05); 
+        }
+        .floating-group input:focus ~ label, .floating-group textarea:focus ~ label, 
+        .floating-group input:not(:placeholder-shown) ~ label, .floating-group textarea:not(:placeholder-shown) ~ label {
+            top: 6px; font-size: 0.75rem; color: #050505; letter-spacing: 0.5px;
+        }
+
+        /* --- TOGGLES & HIDDEN SECTIONS --- */
+        .toggle-row { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; cursor: pointer; font-weight: 600; user-select: none; color: #444; }
+        .toggle-row input { transform: scale(1.4); accent-color: #050505; cursor: pointer; }
+        .hidden-section { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed rgba(0,0,0,0.1); animation: slideDown 0.4s ease; }
+
+        /* --- 3D INTERACTIVE CREDIT CARD --- */
+        .card-scene { width: 100%; height: 210px; perspective: 1000px; margin-bottom: 30px; display: none; }
+        .card-object { width: 100%; height: 100%; position: relative; transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); transform-style: preserve-3d; }
+        .card-object.is-flipped { transform: rotateY(180deg); }
+        .card-face {
+            position: absolute; width: 100%; height: 100%; backface-visibility: hidden;
+            border-radius: 15px; padding: 25px; color: white; display: flex; flex-direction: column; justify-content: space-between;
+            background: linear-gradient(135deg, #111 0%, #333 100%); box-shadow: 0 15px 35px rgba(0,0,0,0.2); overflow: hidden;
+        }
+        .card-face::before {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: linear-gradient(to bottom right, rgba(255,255,255,0.2), rgba(255,255,255,0)); transform: rotate(30deg);
+        }
+        .card-back { transform: rotateY(180deg); background: linear-gradient(135deg, #222 0%, #000 100%); }
+        
+        .card-logo { font-family: 'Share Tech', sans-serif; color: #facc15; font-size: 20px; font-weight: bold; align-self: flex-end; }
+        .card-chip { width: 45px; height: 35px; background: linear-gradient(135deg, #ffd700, #daa520); border-radius: 6px; box-shadow: inset 0 0 5px rgba(0,0,0,0.3); }
+        .card-number-display { font-size: 1.6rem; letter-spacing: 3px; font-family: 'Share Tech', sans-serif; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .card-details-display { display: flex; justify-content: space-between; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .card-stripe { width: 120%; height: 45px; background: #050505; margin-left: -25px; margin-top: 15px; }
+        .card-cvv-display { background: white; color: black; padding: 10px 15px; text-align: right; margin-top: 20px; border-radius: 4px; font-family: 'Share Tech', sans-serif; font-size: 1.2rem; }
+
+        /* --- OPTIONS TABS (Shipping & Payment) --- */
+        .options-list { display: flex; flex-direction: column; gap: 15px; }
+        .option-card {
+            border: 2px solid rgba(0,0,0,0.05); border-radius: 12px; padding: 20px; cursor: pointer;
+            transition: all 0.3s; background: rgba(255,255,255,0.6); position: relative; overflow: hidden;
+        }
+        .option-header { display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 1.1rem; z-index: 2; position: relative; }
+        .option-header-left { display: flex; align-items: center; }
+        .option-card input[type="radio"] { accent-color: #050505; transform: scale(1.4); margin-right: 15px; }
+        .option-card.active { border-color: #050505; background: rgba(255,255,255,0.9); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+        .option-card.active::after { content: ''; position: absolute; top: 0; left: 0; width: 5px; height: 100%; background: #facc15; }
+        .option-desc { font-size: 0.95rem; color: #666; padding-left: 33px; margin-top: 5px; font-weight: 600; }
+        .pay-details { display: none; padding-top: 20px; margin-top: 15px; border-top: 1px dashed rgba(0,0,0,0.1); z-index: 2; position: relative; }
+        .option-card.active .pay-details { display: block; animation: fadeIn 0.4s ease; }
+
+        /* --- GOD TIER BUTTON --- */
+        .btn-next {
+            background: #050505; color: #facc15; padding: 20px; border: none; border-radius: 12px;
+            font-size: 1.2rem; font-weight: 700; cursor: pointer; width: 100%; margin-top: 20px;
+            position: relative; overflow: hidden; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            font-family: 'Share Tech', sans-serif; letter-spacing: 1px; text-transform: uppercase;
+        }
+        .btn-next::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(250, 204, 21, 0.4), transparent);
+            transform: skewX(-20deg); transition: 0.5s;
+        }
+        .btn-next:hover { transform: translateY(-3px); box-shadow: 0 15px 30px rgba(5, 5, 5, 0.3); }
+        .btn-next:hover::before { left: 150%; transition: 0.7s; }
+        
+        .btn-terminal { font-family: 'Share Tech', sans-serif; display: flex; justify-content: center; align-items: center; gap: 10px; }
+        .terminal-cursor { display: inline-block; width: 8px; height: 18px; background: #facc15; animation: blink 1s infinite; display: none; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        /* --- ORDER SUMMARY & PROMO --- */
+        .summary-card { position: sticky; top: 100px; }
+        .summary-title { font-size: 1.6rem; font-weight: 700; border-bottom: 2px solid rgba(0,0,0,0.05); padding-bottom: 15px; margin-bottom: 25px; }
+        
+        .checkout-items { max-height: 350px; overflow-y: auto; padding-right: 10px; margin-bottom: 20px; }
+        .checkout-items::-webkit-scrollbar { width: 5px; }
+        .checkout-items::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+        
+        .c-item { display: flex; gap: 15px; margin-bottom: 20px; opacity: 0; animation: staggerIn 0.5s forwards; }
+        @keyframes staggerIn { to { opacity: 1; transform: translateX(0); } from { opacity: 0; transform: translateX(20px); } }
+        
+        .c-item img { width: 80px; height: 80px; object-fit: cover; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); }
+        .c-item-title { font-weight: 700; font-size: 1.1rem; color: #050505; }
+        .c-item-price { color: #888; font-size: 0.95rem; margin-top: 5px; font-weight: 600; }
+
+        .promo-box { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid rgba(0,0,0,0.05); padding-bottom: 25px; }
+        .promo-box input { flex: 1; padding: 15px; border: 2px solid rgba(0,0,0,0.1); border-radius: 8px; outline: none; font-size: 1rem; font-family: 'Space Grotesk', sans-serif;}
+        .promo-box input:focus { border-color: #050505; }
+        .promo-box button { background: #050505; color: #facc15; border: none; padding: 0 25px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; font-family: 'Share Tech', sans-serif; text-transform: uppercase; letter-spacing: 1px;}
+        .promo-box button:hover { background: #facc15; color: #050505; }
+        #promoMessage { font-size: 0.9rem; margin-top: -15px; margin-bottom: 15px; display: block; font-weight: bold; }
+
+        .summary-totals { display: flex; flex-direction: column; gap: 15px; }
+        .total-row { display: flex; justify-content: space-between; font-size: 1.1rem; color: #666; font-weight: 600; }
+        .total-row.discount-row { color: #e74c3c; display: none; } 
+        .total-row.grand-total { font-size: 1.8rem; color: #050505; padding-top: 15px; border-top: 2px solid rgba(0,0,0,0.05); margin-top: 5px; }
+        
+        /* --- MOBILE OVERRIDES (THE WOBBLE FIX) --- */
+        @media(max-width: 900px) {
+            /* Header Fixes */
+            .checkout-header { padding: 15px 5%; }
+            .checkout-header .logo { font-size: 20px; }
+            .secure-badge { font-size: 12px; }
+            
+            /* Container & Grid Fixes */
+            .checkout-container { grid-template-columns: 1fr; gap: 30px; padding: 0 4%; margin-top: 20px; }
+            .input-grid { grid-template-columns: 1fr; }
+            .input-full { grid-column: span 1; }
+            .summary-card { position: relative; top: 0; padding: 25px 20px; }
+            .step-card { padding: 25px 20px; }
+            
+            /* Progress Bar Shrink */
+            .progress-container { font-size: 0.85rem; margin-top: 20px;}
+            .progress-step { padding: 0 8px; font-size: 0.9rem; }
+            
+            /* 3D Card Shrink (Crucial for fixing horizontal overflow) */
+            .card-scene { height: 180px; }
+            .card-face { padding: 20px; }
+            .card-number-display { font-size: 1.25rem; letter-spacing: 1px; }
+            .card-details-display { font-size: 0.75rem; }
+            
+            /* Button Wrapping Fix */
+            .btn-next { padding: 15px 10px; font-size: 1rem; }
+            .btn-terminal { font-size: 0.9rem; white-space: normal; line-height: 1.3; text-align: center; }
+            
+            /* Summary Fixes */
+            .c-item-title { font-size: 1rem; }
+            .c-item img { width: 65px; height: 65px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ambient-glow"></div>
+    <div class="ambient-glow two"></div>
+
+    <header class="checkout-header">
+        <a href="hi.html" class="logo">MYBRAND</a>
+        <div class="secure-badge">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            Encrypted
+        </div>
+    </header>
+
+    <div class="progress-container">
+        <div class="progress-step active" id="prog1">1. Address</div>
+        <div class="progress-step" id="prog2">2. Shipping</div>
+        <div class="progress-step" id="prog3">3. Payment</div>
+    </div>
+
+    <div class="checkout-container">
+        
+        <div class="checkout-steps">
+            
+            <div class="step-card active" id="step1">
+                <div class="step-header"><div class="step-number">1</div> Shipping Address</div>
+                <div class="step-content">
+                    <form id="addressForm">
+                        <div class="input-grid">
+                            <div class="floating-group">
+                                <input type="text" id="fname" placeholder=" " required>
+                                <label for="fname">First Name</label>
+                            </div>
+                            <div class="floating-group">
+                                <input type="text" id="lname" placeholder=" " required>
+                                <label for="lname">Last Name</label>
+                            </div>
+                            <div class="floating-group input-full">
+                                <input type="text" id="address" placeholder=" " required>
+                                <label for="address">Full Street Address</label>
+                            </div>
+                            <div class="floating-group">
+                                <input type="text" id="city" placeholder=" " required>
+                                <label for="city">City</label>
+                            </div>
+                            <div class="floating-group">
+                                <input type="text" id="zip" placeholder=" " required>
+                                <label for="zip">Postal Code</label>
+                            </div>
+                        </div>
+
+                        <label class="toggle-row">
+                            <input type="checkbox" checked> Save my information for next time
+                        </label>
+
+                        <label class="toggle-row">
+                            <input type="checkbox" id="billingToggle" checked onchange="toggleBilling()"> Billing address is same as shipping
+                        </label>
+                        <div class="hidden-section" id="billingSection">
+                            <div class="floating-group input-full" style="margin-bottom:0;">
+                                <input type="text" id="billAddress" placeholder=" ">
+                                <label for="billAddress">Billing Street Address</label>
+                            </div>
+                        </div>
+
+                        <label class="toggle-row">
+                            <input type="checkbox" onchange="document.getElementById('notesSection').style.display = this.checked ? 'block' : 'none'"> Add delivery instructions or gift message
+                        </label>
+                        <div class="hidden-section" id="notesSection">
+                            <div class="floating-group input-full" style="margin-bottom:0;">
+                                <textarea id="orderNotes" rows="3" placeholder=" "></textarea>
+                                <label for="orderNotes">E.g., Leave package at back door...</label>
+                            </div>
+                        </div>
+
+                        <button type="button" class="btn-next" onclick="goToStep(2)">Proceed to Delivery Options</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="step-card" id="step2">
+                <div class="step-header"><div class="step-number">2</div> Delivery Options</div>
+                <div class="step-content">
+                    <div class="options-list">
+                        <label class="option-card active" onclick="selectShipping(this, 0)">
+                            <div class="option-header">
+                                <div class="option-header-left"><input type="radio" name="shipping" checked> Standard Delivery</div>
+                                <span>FREE</span>
+                            </div>
+                            <div class="option-desc">Delivery in 5-7 business days. Fully tracked.</div>
+                        </label>
+
+                        <label class="option-card" onclick="selectShipping(this, 15)">
+                            <div class="option-header">
+                                <div class="option-header-left"><input type="radio" name="shipping"> Express Delivery</div>
+                                <span>$15.00</span>
+                            </div>
+                            <div class="option-desc">Delivery in 1-2 business days. Priority handling.</div>
+                        </label>
+                    </div>
+                    <button type="button" class="btn-next" onclick="goToStep(3)">Proceed to Secure Payment</button>
+                </div>
+            </div>
+
+            <div class="step-card" id="step3">
+                <div class="step-header"><div class="step-number">3</div> Secure Payment</div>
+                <div class="step-content">
+                    
+                    <div class="card-scene" id="cardScene">
+                        <div class="card-object" id="virtualCard">
+                            <div class="card-face">
+                                <div style="display: flex; justify-content: space-between; width: 100%;">
+                                    <div class="card-chip"></div>
+                                    <div class="card-logo">MYBRAND</div>
+                                </div>
+                                <div class="card-number-display" id="vCardNum">#### #### #### ####</div>
+                                <div class="card-details-display">
+                                    <span id="vCardName">CARDHOLDER NAME</span>
+                                    <span id="vCardExp">MM/YY</span>
+                                </div>
+                            </div>
+                            <div class="card-face card-back">
+                                <div class="card-stripe"></div>
+                                <div class="card-cvv-display"><span id="vCardCvv">***</span></div>
+                                <div class="card-logo" style="margin-top:auto;">SECURE</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="options-list">
+                        <label class="option-card active" onclick="selectPayment(this, 'card')">
+                            <div class="option-header">
+                                <div class="option-header-left"><input type="radio" name="payment" checked> Credit / Debit Card</div>
+                            </div>
+                            <div class="pay-details" id="cardDetailsForm">
+                                <div class="floating-group input-full">
+                                    <input type="tel" id="ccNum" placeholder=" " maxlength="19" oninput="updateCard('num', this.value)" onfocus="flipCard(false)">
+                                    <label for="ccNum">Card Number</label>
+                                </div>
+                                <div class="floating-group input-full">
+                                    <input type="text" id="ccName" placeholder=" " oninput="updateCard('name', this.value)" onfocus="flipCard(false)">
+                                    <label for="ccName">Name on Card</label>
+                                </div>
+                                <div class="input-grid" style="margin-bottom:0;">
+                                    <div class="floating-group">
+                                        <input type="tel" id="ccExp" placeholder=" " maxlength="5" oninput="updateCard('exp', this.value)" onfocus="flipCard(false)">
+                                        <label for="ccExp">Expiry (MM/YY)</label>
+                                    </div>
+                                    <div class="floating-group">
+                                        <input type="password" id="ccCvv" placeholder=" " maxlength="3" oninput="updateCard('cvv', this.value)" onfocus="flipCard(true)">
+                                        <label for="ccCvv">CVV Code</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </label>
+
+                        <label class="option-card" onclick="selectPayment(this, 'upi')">
+                            <div class="option-header">
+                                <div class="option-header-left"><input type="radio" name="payment"> UPI / Digital Wallet</div>
+                            </div>
+                            <div class="pay-details">
+                                <div class="floating-group input-full" style="margin-bottom:0;">
+                                    <input type="text" id="upiId" placeholder=" ">
+                                    <label for="upiId">Enter UPI ID (e.g. name@bank)</label>
+                                </div>
+                            </div>
+                        </label>
+
+                        <label class="option-card" onclick="selectPayment(this, 'cod')">
+                            <div class="option-header">
+                                <div class="option-header-left"><input type="radio" name="payment"> Cash on Delivery (COD)</div>
+                            </div>
+                            <div class="pay-details"><p style="color:#555; font-weight:600;">Pay with cash or UPI when your order arrives at your doorstep.</p></div>
+                        </label>
+                    </div>
+
+                    <button type="button" class="btn-next" id="placeOrderBtn" onclick="processGodTierCheckout()">
+                        <div class="btn-terminal">
+                            <span id="btnText">AUTHORIZE & PAY</span>
+                            <span class="terminal-cursor" id="tCursor"></span>
+                        </div>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="summary-card">
+            <h2 class="summary-title">Order Summary</h2>
+            
+            <div class="checkout-items" id="checkoutItemsList">
+                </div>
+
+            <div class="promo-box">
+                <input type="text" id="promoInput" placeholder="Promo code (Try PROMO20)">
+                <button onclick="applyPromo()">Apply</button>
+            </div>
+            <span id="promoMessage"></span>
+
+            <div class="summary-totals">
+                <div class="total-row"><span>Subtotal</span> <span id="chkSubtotal">$0.00</span></div>
+                <div class="total-row discount-row" id="discountRow"><span>Discount (20%)</span> <span id="chkDiscount">-$0.00</span></div>
+                <div class="total-row"><span>Shipping</span> <span id="chkShipping" style="color:#2ecc71;">FREE</span></div>
+                <div class="total-row"><span>Taxes (5%)</span> <span id="chkTax">$0.00</span></div>
+                <div class="total-row grand-total"><span>Total</span> <span id="chkTotal">$0.00</span></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- GLOBAL VARIABLES ---
+        let baseSubtotal = 0;
+        let shippingCost = 0;
+        let discountAmount = 0;
+
+        // --- ANIMATED ACCORDION & PROGRESS BAR ---
+        function goToStep(stepNum) {
+            document.querySelectorAll('.step-card').forEach(card => card.classList.remove('active'));
+            document.getElementById(`step${stepNum}`).classList.add('active');
+            
+            if(stepNum > 1) { document.getElementById(`step${stepNum-1}`).classList.add('completed'); }
+            
+            // Progress Bar Sync
+            document.querySelectorAll('.progress-step').forEach((el, index) => {
+                if(index + 1 < stepNum) {
+                    el.classList.add('completed'); el.classList.remove('active');
+                } else if (index + 1 === stepNum) {
+                    el.classList.add('active'); el.classList.remove('completed');
+                } else {
+                    el.classList.remove('active', 'completed');
+                }
+            });
+
+            // Show 3D card only on step 3 if Card is selected
+            if(stepNum === 3 && document.querySelector('input[name="payment"]:checked').parentElement.textContent.includes("Card")) {
+                document.getElementById('cardScene').style.display = 'block';
+            }
+
+            // Smooth scroll on mobile
+            if(window.innerWidth <= 900) {
+                document.getElementById(`step${stepNum}`).scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        // --- TOGGLES ---
+        function toggleBilling() {
+            const isChecked = document.getElementById('billingToggle').checked;
+            document.getElementById('billingSection').style.display = isChecked ? 'none' : 'block';
+        }
+
+        // --- SHIPPING & PAYMENT HIGHLIGHTERS ---
+        function selectShipping(selectedLabel, cost) {
+            document.querySelectorAll('#step2 .option-card').forEach(m => m.classList.remove('active'));
+            selectedLabel.querySelector('input').checked = true;
+            selectedLabel.classList.add('active');
+            
+            shippingCost = cost;
+            const shipElement = document.getElementById('chkShipping');
+            shipElement.innerText = cost === 0 ? "FREE" : `$${cost.toFixed(2)}`;
+            shipElement.style.color = cost === 0 ? "#2ecc71" : "#666";
+            calculateTotals();
+        }
+
+        function selectPayment(selectedLabel, type) {
+            document.querySelectorAll('#step3 .option-card').forEach(m => m.classList.remove('active'));
+            selectedLabel.querySelector('input').checked = true;
+            selectedLabel.classList.add('active');
+            
+            const cardScene = document.getElementById('cardScene');
+            if(type === 'card') {
+                cardScene.style.display = 'block';
+                cardScene.style.animation = 'slideDown 0.5s';
+            } else {
+                cardScene.style.display = 'none';
+            }
+        }
+
+        // --- 3D VIRTUAL CARD LOGIC ---
+        function flipCard(isBack) {
+            const card = document.getElementById('virtualCard');
+            if(isBack) { card.classList.add('is-flipped'); } 
+            else { card.classList.remove('is-flipped'); }
+        }
+
+        function updateCard(field, value) {
+            if(field === 'num') {
+                let v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+                let formatted = v.match(/.{1,4}/g);
+                document.getElementById('ccNum').value = formatted ? formatted.join(' ') : v;
+                document.getElementById('vCardNum').innerText = formatted ? formatted.join(' ') : '#### #### #### ####';
+            }
+            if(field === 'name') document.getElementById('vCardName').innerText = value.toUpperCase() || 'CARDHOLDER NAME';
+            if(field === 'exp') {
+                let v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+                if (v.length >= 2) v = v.substring(0, 2) + '/' + v.substring(2, 4);
+                document.getElementById('ccExp').value = v;
+                document.getElementById('vCardExp').innerText = v || 'MM/YY';
+            }
+            if(field === 'cvv') document.getElementById('vCardCvv').innerText = value || '***';
+        }
+
+        // --- PROMO CODE LOGIC ---
+        function applyPromo() {
+            const input = document.getElementById('promoInput').value.trim().toUpperCase();
+            const msg = document.getElementById('promoMessage');
+            const row = document.getElementById('discountRow');
+
+            if (input === 'PROMO20') {
+                msg.innerText = "✅ Promo code applied successfully!";
+                msg.style.color = "#2ecc71";
+                row.style.display = "flex";
+                discountAmount = baseSubtotal * 0.20; 
+            } else {
+                msg.innerText = "❌ Invalid promo code.";
+                msg.style.color = "#e74c3c";
+                row.style.display = "none";
+                discountAmount = 0;
+            }
+            calculateTotals();
+        }
+
+        // --- MASTER MATH FUNCTION ---
+        function calculateTotals() {
+            const tax = (baseSubtotal - discountAmount) * 0.05; 
+            const grandTotal = (baseSubtotal - discountAmount) + shippingCost + tax;
+
+            document.getElementById('chkSubtotal').innerText = `$${baseSubtotal.toFixed(2)}`;
+            document.getElementById('chkDiscount').innerText = `-$${discountAmount.toFixed(2)}`;
+            document.getElementById('chkTax').innerText = `$${tax.toFixed(2)}`;
+            document.getElementById('chkTotal').innerText = `$${grandTotal.toFixed(2)}`;
+        }
+
+        // --- LOAD CART DATA (With Stagger Animation) ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const checkoutList = document.getElementById('checkoutItemsList');
+            const cart = JSON.parse(localStorage.getItem('MyBrandCart')) || [];
+            
+            if (cart.length === 0) {
+                checkoutList.innerHTML = '<p style="color:#888; font-weight:600; text-align:center; padding: 20px;">Your cart is empty.</p>';
+                document.getElementById('placeOrderBtn').style.display = 'none';
+                return;
+            }
+
+            checkoutList.innerHTML = '';
+            
+            cart.forEach((item, index) => {
+                const priceNum = parseFloat(item.price.replace(/[^0-9.]/g, ''));
+                baseSubtotal += (priceNum * item.quantity);
+
+                checkoutList.innerHTML += `
+                    <div class="c-item" style="animation-delay: ${index * 0.15}s;">
+                        <img src="${item.image}" alt="${item.title}">
+                        <div class="c-item-details">
+                            <div class="c-item-title">${item.title}</div>
+                            <div class="c-item-price">Qty: ${item.quantity} | Size: ${item.size} <br> <span style="color:#050505;">${item.price}</span></div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            calculateTotals();
+        });
+
+        // --- GOD TIER TERMINAL CHECKOUT EFFECT ---
+        function processGodTierCheckout() {
+            const btn = document.getElementById('placeOrderBtn');
+            const text = document.getElementById('btnText');
+            const cursor = document.getElementById('tCursor');
+            
+            btn.style.pointerEvents = "none";
+            cursor.style.display = "inline-block";
+            btn.style.background = "#222";
+            
+            const sequence = [
+                { msg: "ESTABLISHING SECURE CONNECTION...", delay: 0 },
+                { msg: "ENCRYPTING DATA...", delay: 1200 },
+                { msg: "AUTHORIZING PAYMENT...", delay: 2400 },
+                { msg: "PAYMENT APPROVED ✓", delay: 4000 }
+            ];
+
+            sequence.forEach(step => {
+                setTimeout(() => {
+                    text.innerText = step.msg;
+                    if(step.msg.includes("APPROVED")) {
+                        btn.style.background = "#2ecc71";
+                        btn.style.color = "#fff";
+                        cursor.style.display = "none";
+                    }
+                }, step.delay);
+            });
+
+            // Final Redirect
+            setTimeout(() => {
+                localStorage.removeItem('MyBrandCart');
+                window.location.href = "hi.html"; // Route to success/home page
+            }, 5500);
+        }
+    </script>
+</body>
+</html>
